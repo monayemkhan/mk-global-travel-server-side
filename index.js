@@ -99,7 +99,7 @@ async function run() {
         });
 
         //update api
-        app.put('/booking/:id', async (req, res) => {
+        app.put('/updatebooking/:id', async (req, res) => {
             const order = req.body;
             const options = { upsert: true };
             const updatedOrder = {
