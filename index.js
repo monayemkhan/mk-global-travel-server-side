@@ -1,12 +1,12 @@
 const express = require('express');
 const { MongoClient } = require('mongodb');
-const objectId = require('mongodb').ObjectId;
+const ObjectId = require('mongodb').ObjectId;
 
 const cors = require('cors');
 require('dotenv').config();
 
 const app = express();
-const port = 5000;
+const port = process.env.PORT || 5000;
 
 // setting the middleware
 app.use(cors());
@@ -23,6 +23,7 @@ async function run() {
         const database = client.db('mkGlobalTravel');
         // console.log(database);
         const travelsCollection = database.collection('travels');
+        const bookingCollection = database.collection('booking');
         // console.log(travelsCollection);
 
         // get API
@@ -32,14 +33,36 @@ async function run() {
             res.send(travels);
         });
 
+        app.get('/booking', async (req, res) => {
+            const cursor = bookingCollection.find({});
+            const booking = await cursor.toArray();
+            res.send(booking);
+        });
+
+        app.get("/mybooking/:email", async (req, res) => {
+            const result = await bookingCollection.find({
+              email: req.params.email,
+            }).toArray();
+            console.log(result)
+            res.send(result);
+          });
+
         // get single travel
         app.get('/travels/:id', async (req, res) => {
             const id = req.params.id;
             console.log('getting specific travel', id);
-            const query = { _id: objectId(id) };
+            const query = { _id: ObjectId(id) };
             const travel = await travelsCollection.findOne(query);
             res.json(travel);
-        })
+        });
+
+        app.get('/booking/:id', async (req, res) => {
+            const id = req.params.id;
+            console.log('getting specific booking', id);
+            const query = { _id: objectId(id) };
+            const booking = await bookingCollection.findOne(query);
+            res.json(booking);
+        });
 
         // post API
         app.post('/travels', async (req, res) => {
@@ -51,13 +74,30 @@ async function run() {
             res.json(result)
         });
 
+        app.post('/booking', async (req, res) => {
+            const booking = req.body;
+            console.log('hit the post api', booking);
+
+            const result = await bookingCollection.insertOne(booking);
+            console.log(result);
+            res.json(result)
+        })
+
         // delete API
         app.delete('/travels/:id', async (req, res) => {
             const id = req.params.id;
-            const query = { _id: objectId(id) };
+            const query = { _id: ObjectId(id) };
             const result = await travelsCollection.deleteOne(query);
             res.json(result);
+        });
+
+        app.delete('/booking/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await bookingCollection.deleteOne(query);
+            res.json(result);
         })
+
     }
     finally {
         // await client.close();
