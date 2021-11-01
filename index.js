@@ -13,7 +13,7 @@ app.use(cors());
 app.use(express.json());
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.we5az.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
-// console.log(uri)
+
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
 //run the async function
@@ -21,10 +21,8 @@ async function run() {
     try {
         await client.connect();
         const database = client.db('mkGlobalTravel');
-        // console.log(database);
         const travelsCollection = database.collection('travels');
         const bookingCollection = database.collection('booking');
-        // console.log(travelsCollection);
 
         // get API
         app.get('/travels', async (req, res) => {
@@ -84,12 +82,12 @@ async function run() {
         })
 
         // delete API
-        app.delete('/travels/:id', async (req, res) => {
-            const id = req.params.id;
-            const query = { _id: ObjectId(id) };
-            const result = await travelsCollection.deleteOne(query);
-            res.json(result);
-        });
+        // app.delete('/travels/:id', async (req, res) => {
+        //     const id = req.params.id;
+        //     const query = { _id: ObjectId(id) };
+        //     const result = await travelsCollection.deleteOne(query);
+        //     res.json(result);
+        // });
 
         app.delete('/booking/:id', async (req, res) => {
             const id = req.params.id;
