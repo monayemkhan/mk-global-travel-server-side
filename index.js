@@ -96,7 +96,19 @@ async function run() {
             const query = { _id: ObjectId(id) };
             const result = await bookingCollection.deleteOne(query);
             res.json(result);
-        })
+        });
+
+        //update api
+        app.put('/booking/:id', async (req, res) => {
+            const order = req.body;
+            const options = { upsert: true };
+            const updatedOrder = {
+                $set: { status: order.status }
+            };
+            const updateStatus = await bookingCollection.updateOne({ _id: ObjectId(req.params.id) }, updatedOrder, options);
+
+            res.json(updateStatus);
+        });
 
     }
     finally {
